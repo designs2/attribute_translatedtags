@@ -167,7 +167,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				$strColNameLangCode // 5
 			))
 			->execute($this->get('id'),$strLangCode);
-			FB::log($objValue, '$objValue');
+
 			while ($objValue->next())
 			{
 
