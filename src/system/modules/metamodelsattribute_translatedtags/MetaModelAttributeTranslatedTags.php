@@ -62,6 +62,75 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		return $arrReturn;
 	}
 
+	/**
+	 * Fetch the ids of options optionally limited to the items with the provided ids.
+	 * NOTE: this does not take the actual availablility of an value in the current or
+	 * fallback languages into account.
+	 * This method is mainly intended as a helper for
+	 * {@see MetaModelAttributeTranslatedTags::getFilterOptions()}
+	 * 
+	 * @param int[] $arrIds a list of item ids that the result shall be limited to.
+	 * 
+	 * @return int[] a list of all matching value ids.
+	 */
+	protected function getValueIds($arrIds = array())
+	{
+		// first off, we need to determine the option ids in the foreign table.
+		$objDB = Database::getInstance();
+		if ($arrIds)
+		{
+			$objValueIds = $objDB->prepare(sprintf('
+				SELECT %1$s.%2$s
+				FROM %1$s
+				LEFT JOIN tl_metamodel_tag_relation ON (
+					(tl_metamodel_tag_relation.att_id=?)
+					AND (tl_metamodel_tag_relation.value_id=%1$s.%2$s)
+				)
+				WHERE tl_metamodel_tag_relation.item_id IN (%3$s) GROUP BY %1$s.%2$s',
+				$this->get('tag_table'), // 1
+				$this->get('tag_id'), // 2
+				implode(',', $arrIds) // 3
+			))
+			->execute($this->get('id'));
+		} else {
+			$objValueIds = $objDB->prepare(sprintf('
+				SELECT %1$s.%2$s
+				FROM %1$s GROUP BY %1$s.%2$s',
+				$this->get('tag_table'), // 1
+				$this->get('tag_id') // 2
+			))
+			->execute();
+		}
+		return $objValueIds->fetchEach($this->get('tag_id'));
+	}
+
+	/**
+	 * Fetch the values with the provided ids and given language.
+	 * This method is mainly intended as a helper for
+	 * {@see MetaModelAttributeTranslatedTags::getFilterOptions()}
+	 * 
+	 * @param int[]  $arrValueIds a list of value ids that the result shall be limited to.
+	 * 
+	 * @param string $strLangCode the language code for which the values shall be retrieved.
+	 * 
+	 * @return Database_Result a database result containing all matching values.
+	 */
+	protected function getValues($arrValueIds, $strLangCode)
+	{
+		// now for the retrival, first with the real language.
+		return Database::getInstance()->prepare(sprintf('
+			SELECT %1$s.*
+			FROM %1$s
+			WHERE %1$s.%2$s IN (%3$s) AND (%1$s.%4$s=?)
+			GROUP BY %1$s.%2$s',
+			$this->get('tag_table'), // 1
+			$this->get('tag_id'), // 2
+			implode(',', $arrValueIds), // 3
+			$this->get('tag_langcolumn')
+		))
+		->execute($strLangCode);
+	}
+
 	/////////////////////////////////////////////////////////////////
 	// interface IMetaModelAttribute
 	/////////////////////////////////////////////////////////////////
@@ -71,6 +140,49 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		return array_merge(parent::getAttributeSettingNames(), array(
 			'tag_langcolumn'
 		));
+	}
+
+	/**
+	 * {@inheritdoc}
+	 * 
+	 * Fetch filter options from foreign table.
+	 * 
+	 */
+	public function getFilterOptions($arrIds = array())
+	{
+		$arrReturn = array();
+
+		if ($this->get('tag_table') && ($strColNameId = $this->get('tag_id')))
+		{
+			// fetch the value ids
+			$arrValueIds = $this->getValueIds($arrIds);
+
+			$strColNameValue = $this->get('tag_column');
+			$strColNameAlias = $this->getAliasCol();
+
+			// now for the retrival, first with the real language.
+			$objValue = $this->getValues($arrValueIds, $this->getMetaModel()->getActiveLanguage());
+			$arrValueIdsRetrieved = array();
+			while ($objValue->next())
+			{
+				$arrValueIdsRetrieved[] = $objValue->$strColNameId;
+				$arrReturn[$objValue->$strColNameAlias] = $objValue->$strColNameValue;
+			}
+			// determine missing ids.
+			$arrValueIds = array_diff($arrValueIds, $arrValueIdsRetrieved);
+			// if there are missing ids and the fallback language is different than the current language, then fetch those now.
+			if ($arrValueIds && ($this->getMetaModel()->getFallbackLanguage() != $this->getMetaModel()->getActiveLanguage()))
+			{
+				$objValue = $this->getValues($arrValueIds, $this->getMetaModel()->getFallbackLanguage());
+				while ($objValue->next())
+				{
+					$arrReturn[$objValue->$strColNameAlias] = $objValue->$strColNameValue;
+				}
+			}
+			// finally sort the result by the value to have an alphabetical list.
+			asort($arrReturn);
+		}
+		return $arrReturn;
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -188,7 +300,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	public function unsetValueFor($arrIds, $strLangCode)
 	{
 		
-	}	
+	}
 }
 
 ?>
