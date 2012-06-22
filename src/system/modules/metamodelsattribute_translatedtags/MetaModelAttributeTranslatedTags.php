@@ -233,20 +233,18 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		return $arrReturn;
 	}
 
-	public function setDataFor($arrValues)
-	{
-		// TODO: store to database.
-	}
-	
 	/////////////////////////////////////////////////////////////////
 	// interface IMetaModelAttributeTranslated
 	/////////////////////////////////////////////////////////////////
 
 	public function setTranslatedDataFor($arrValues, $strLangCode)
 	{
-		// TODO: Save values.
+		// although we are translated, we do not manipulate tertiary tables
+		// in this attribute. Updating the reference table from plain setDataFor
+		// will do just fine.
+		$this->setDataFor($arrValues);
 	}
-	
+
 	/**
 	 * Get values for the given items in a certain language.
 	 */
@@ -278,8 +276,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				implode(',', $arrIds), // 4
 				$strColNameLangCode // 5
 			))
-			->execute($this->get('id'),$strLangCode);
-
+			->execute($this->get('id'), $strLangCode);
 			while ($objValue->next())
 			{
 
@@ -287,7 +284,9 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				{
 					$arrReturn[$objValue->$strMetaModelTableNameId] = array();
 				}
-				$arrReturn[$objValue->$strMetaModelTableNameId][$objValue->$strColNameId] = $objValue->row();
+				$arrData = $objValue->row();
+				unset($arrData[$strMetaModelTableNameId]);
+				$arrReturn[$objValue->$strMetaModelTableNameId][$objValue->$strColNameId] = $arrData;
 			}
 		}
 		
