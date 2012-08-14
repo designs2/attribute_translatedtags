@@ -208,9 +208,9 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				unset($arrTagCount[$key]);
 			}
 		}
-		
+
 		$arrFallbackIds = array_keys($arrTagCount);
-		
+
 		// second round, fetch fallback languages if not all items could be resolved.
 		if ((count($arrFallbackIds) > 0) && ($strActiveLanguage != $strFallbackLanguage))
 		{
@@ -230,6 +230,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 			}
 
 		}
+
 		return $arrReturn;
 	}
 
@@ -269,7 +270,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 					AND (tl_metamodel_tag_relation.value_id=%1$s.%3$s)
 					AND (%1$s.%5$s=?)
 				)
-				WHERE tl_metamodel_tag_relation.item_id IN (%4$s)',
+				WHERE tl_metamodel_tag_relation.item_id IN (%4$s) ORDER BY %1$s.sorting',
 				$strTableName, // 1
 				$strMetaModelTableNameId, // 2
 				$strColNameId, // 3
@@ -277,6 +278,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				$strColNameLangCode // 5
 			))
 			->execute($this->get('id'), $strLangCode);
+
 			while ($objValue->next())
 			{
 
@@ -289,7 +291,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				$arrReturn[$objValue->$strMetaModelTableNameId][$objValue->$strColNameId] = $arrData;
 			}
 		}
-		
+
 		return $arrReturn;
 	}
 
