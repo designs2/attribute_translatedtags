@@ -254,6 +254,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		$strTableName = $this->get('tag_table');
 		$strColNameId = $this->get('tag_id');
 		$strColNameLangCode = $this->get('tag_langcolumn');
+		$strSortColumn = $this->get('tag_sorting');
 		$arrReturn = array();
 		
 		if ($strTableName && $strColNameId && $strColNameLangCode)
