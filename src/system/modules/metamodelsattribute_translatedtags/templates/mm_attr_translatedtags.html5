@@ -1,7 +1,8 @@
+<?php if ($this->raw): ?>
 <ul>
 <?php
 $i=0;
-$last=count($this->tags)-1;
+$last=count($this->raw)-1;
 
 foreach ($this->raw as $arrTag):
 	$arrClass = array();
@@ -23,3 +24,4 @@ foreach ($this->raw as $arrTag):
 <li class="<?php echo implode(' ', $arrClass); ?>"><?php echo $arrTag[$this->value]; ?></li>
 <?php endforeach; ?>
 </ul>
+<?php endif; ?>

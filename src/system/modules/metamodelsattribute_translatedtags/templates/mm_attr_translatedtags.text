@@ -1,3 +1,4 @@
+<?php if (count($this->raw)): ?>
 <?php
 $arrTextFormat = array();
 
@@ -8,3 +9,4 @@ foreach ($this->raw as $arrTag)
 
 echo implode(', ', $arrTextFormat);
 ?>
+<?php endif; ?>
