@@ -20,12 +20,12 @@ if (!defined('TL_ROOT'))
 
 /**
  * This is the MetaModelAttribute class for handling tag attributes.
- * 
+ *
  * @package	   MetaModels
  * @subpackage AttributeTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  */
-class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements IMetaModelAttributeTranslated 
+class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements IMetaModelAttributeTranslated
 {
 	/**
 	 * Get numbers of tag for the given ids.
@@ -36,14 +36,14 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		$strTableName = $this->get('tag_table');
 		$strColNameId = $this->get('tag_id');
 		$arrReturn = array();
-		
+
 		if ($strTableName && $strColNameId)
 		{
 			$strMetaModelTableName = $this->getMetaModel()->getTableName();
 			$strMetaModelTableNameId = $strMetaModelTableName.'_id';
 
 			$objValue = $objDB->prepare(sprintf(
-					'SELECT `item_id`, count(*) as count FROM `tl_metamodel_tag_relation` 
+					'SELECT `item_id`, count(*) as count FROM `tl_metamodel_tag_relation`
 						WHERE att_id = ? AND item_id IN (%1$s) group BY `item_id`',
 					implode(',', $arrIds) // 1
 					))
@@ -68,9 +68,9 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	 * fallback languages into account.
 	 * This method is mainly intended as a helper for
 	 * {@see MetaModelAttributeTranslatedTags::getFilterOptions()}
-	 * 
+	 *
 	 * @param int[] $arrIds a list of item ids that the result shall be limited to.
-	 * 
+	 *
 	 * @return int[] a list of all matching value ids.
 	 */
 	protected function getValueIds($arrIds = array())
@@ -108,11 +108,11 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	 * Fetch the values with the provided ids and given language.
 	 * This method is mainly intended as a helper for
 	 * {@see MetaModelAttributeTranslatedTags::getFilterOptions()}
-	 * 
+	 *
 	 * @param int[]  $arrValueIds a list of value ids that the result shall be limited to.
-	 * 
+	 *
 	 * @param string $strLangCode the language code for which the values shall be retrieved.
-	 * 
+	 *
 	 * @return Database_Result a database result containing all matching values.
 	 */
 	protected function getValues($arrValueIds, $strLangCode)
@@ -144,9 +144,9 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 
 	/**
 	 * {@inheritdoc}
-	 * 
+	 *
 	 * Fetch filter options from foreign table.
-	 * 
+	 *
 	 */
 	public function getFilterOptions($arrIds = array())
 	{
@@ -203,14 +203,14 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		foreach ($arrReturn as $key => $results)
 		{
 			// remove matching tags
-			if (count($results) == $arrTagCount[$key]) 
+			if (count($results) == $arrTagCount[$key])
 			{
 				unset($arrTagCount[$key]);
 			}
 		}
-		
+
 		$arrFallbackIds = array_keys($arrTagCount);
-		
+
 		// second round, fetch fallback languages if not all items could be resolved.
 		if ((count($arrFallbackIds) > 0) && ($strActiveLanguage != $strFallbackLanguage))
 		{
@@ -231,6 +231,15 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 
 		}
 		return $arrReturn;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function searchFor($strPattern)
+	{
+		// FIXME: unimplemented
+		throw new Exception('MetaModelAttributeTranslatedTags::searchFor() is not yet implemented, please do it or find someone who can!', 1);
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -256,7 +265,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		$strColNameLangCode = $this->get('tag_langcolumn');
 		$strSortColumn = $this->get('tag_sorting');
 		$arrReturn = array();
-		
+
 		if ($strTableName && $strColNameId && $strColNameLangCode)
 		{
 			$strMetaModelTableName = $this->getMetaModel()->getTableName();
@@ -290,7 +299,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				$arrReturn[$objValue->$strMetaModelTableNameId][$objValue->$strColNameId] = $arrData;
 			}
 		}
-		
+
 		return $arrReturn;
 	}
 
@@ -299,7 +308,17 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	 */
 	public function unsetValueFor($arrIds, $strLangCode)
 	{
-		
+		// FIXME: unimplemented
+		throw new Exception('MetaModelAttributeTranslatedTags::unsetValueFor() is not yet implemented, please do it or find someone who can!', 1);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function searchForInLanguages($strPattern, $arrLanguages = array())
+	{
+		// FIXME: unimplemented
+		throw new Exception('MetaModelAttributeTranslatedTags::searchForInLanguages() is not yet implemented, please do it or find someone who can!', 1);
 	}
 }
 
