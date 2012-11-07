@@ -238,8 +238,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	 */
 	public function searchFor($strPattern)
 	{
-		// FIXME: unimplemented
-		throw new Exception('MetaModelAttributeTranslatedTags::searchFor() is not yet implemented, please do it or find someone who can!', 1);
+		return $this->searchForInLanguages($strPattern, array($this->getMetaModel()->getActiveLanguage()));
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -317,8 +316,26 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	 */
 	public function searchForInLanguages($strPattern, $arrLanguages = array())
 	{
-		// FIXME: unimplemented
-		throw new Exception('MetaModelAttributeTranslatedTags::searchForInLanguages() is not yet implemented, please do it or find someone who can!', 1);
+		$arrParams = array($strPattern);
+		$strTableName = $this->get('tag_table');
+		$strColNameId = $this->get('tag_id');
+		$strColNameLangCode = $this->get('tag_langcolumn');
+		$strColumn = $this->get('tag_column');
+
+		$objFilterRule = new MetaModelFilterRuleSimpleQuery(
+			sprintf('SELECT item_id FROM tl_metamodel_tag_relation WHERE value_id IN (SELECT DISTINCT %s FROM %s WHERE %s = ?%s) AND att_id = %s',
+				$strColNameId,
+				$strTableName,
+				$strColumn,
+				$arrLanguages ? sprintf(' AND %s IN (\'%s\')',$strColNameLangCode,implode('\',\'', $arrLanguages)) : '',
+				$this->get('id')
+				
+			),
+			$arrParams,
+			'item_id'
+		);
+
+		return $objFilterRule->getMatchingIds();
 	}
 }
 
