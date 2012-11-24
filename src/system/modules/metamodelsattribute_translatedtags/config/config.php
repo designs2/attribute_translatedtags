@@ -9,8 +9,8 @@
  * @package	   MetaModels
  * @subpackage AttributeTranslatedTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
- * @copyright  CyberSpectrum, MEN AT WORK
- * @license    private
+ * @copyright  The MetaModels team.
+ * @license    LGPL.
  * @filesource
  */
 if (!defined('TL_ROOT'))
