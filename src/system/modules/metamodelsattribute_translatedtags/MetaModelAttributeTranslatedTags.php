@@ -148,7 +148,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	 * Fetch filter options from foreign table.
 	 *
 	 */
-	public function getFilterOptions($arrIds = array())
+	public function getFilterOptions($arrIds, $usedOnly)
 	{
 		$arrReturn = array();
 
@@ -329,7 +329,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				$strColumn,
 				$arrLanguages ? sprintf(' AND %s IN (\'%s\')',$strColNameLangCode,implode('\',\'', $arrLanguages)) : '',
 				$this->get('id')
-				
+
 			),
 			$arrParams,
 			'item_id'
