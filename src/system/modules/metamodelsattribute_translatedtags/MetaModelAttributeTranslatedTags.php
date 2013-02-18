@@ -171,6 +171,10 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		{
 			// fetch the value ids
 			$arrValueIds = $this->getValueIds($arrIds, $usedOnly);
+			if (!count($arrValueIds))
+			{
+				return $arrReturn;
+			}
 
 			$strColNameValue = $this->get('tag_column');
 			$strColNameAlias = $this->getAliasCol();
