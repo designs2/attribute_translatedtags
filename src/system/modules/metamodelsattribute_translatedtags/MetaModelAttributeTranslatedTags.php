@@ -69,15 +69,22 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	 * This method is mainly intended as a helper for
 	 * {@see MetaModelAttributeTranslatedTags::getFilterOptions()}
 	 *
-	 * @param int[] $arrIds a list of item ids that the result shall be limited to.
+	 * @param int[] $arrIds      a list of item ids that the result shall be limited to.
+	 *
+	 * @param bool  $blnUsedOnly do only return ids that have matches in the real table.
 	 *
 	 * @return int[] a list of all matching value ids.
 	 */
-	protected function getValueIds($arrIds = array())
+	protected function getValueIds($arrIds, $blnUsedOnly)
 	{
+		if ($arrIds === array())
+		{
+			return array();
+		}
+
 		// first off, we need to determine the option ids in the foreign table.
 		$objDB = Database::getInstance();
-		if ($arrIds)
+		if ($arrIds !== NULL)
 		{
 			$objValueIds = $objDB->prepare(sprintf('
 				SELECT %1$s.%2$s
@@ -90,6 +97,14 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				$this->get('tag_table'), // 1
 				$this->get('tag_id'), // 2
 				implode(',', $arrIds) // 3
+			))
+			->execute($this->get('id'));
+		} else if ($blnUsedOnly) {
+			$objValueIds = $objDB->prepare(sprintf('
+				SELECT value_id AS %1$s
+				FROM tl_metamodel_tag_relation
+				WHERE att_id=? GROUP BY value_id',
+				$this->get('tag_id')
 			))
 			->execute($this->get('id'));
 		} else {
@@ -155,7 +170,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		if ($this->get('tag_table') && ($strColNameId = $this->get('tag_id')))
 		{
 			// fetch the value ids
-			$arrValueIds = $this->getValueIds($arrIds);
+			$arrValueIds = $this->getValueIds($arrIds, $usedOnly);
 
 			$strColNameValue = $this->get('tag_column');
 			$strColNameAlias = $this->getAliasCol();
@@ -179,6 +194,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 					$arrReturn[$objValue->$strColNameAlias] = $objValue->$strColNameValue;
 				}
 			}
+
 			// finally sort the result by the value to have an alphabetical list.
 			asort($arrReturn);
 		}
@@ -323,7 +339,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		$strColNameLangCode = $this->get('tag_langcolumn');
 		$strColumn = $this->get('tag_column');
 		$strColAlias = $this->get('tag_alias') ? $this->get('tag_alias') : $strColNameId;
-        
+
 		$objFilterRule = new MetaModelFilterRuleSimpleQuery(
 			sprintf('SELECT item_id FROM tl_metamodel_tag_relation WHERE value_id IN (SELECT DISTINCT %1$s FROM %2$s WHERE %3$s LIKE ? OR %6$s LIKE ?%4$s) AND att_id = %5$s',
 				$strColNameId,  //1
