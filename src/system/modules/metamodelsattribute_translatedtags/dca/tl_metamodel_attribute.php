@@ -19,12 +19,12 @@ if (!defined('TL_ROOT'))
 }
 
 /**
- * Table tl_metamodel_attribute 
+ * Table tl_metamodel_attribute
  */
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['metapalettes']['translatedtags extends tags'] = array
 (
-	'+title' => array('tag_langcolumn after tag_id')
+	'+display' => array('tag_langcolumn after tag_id')
 );
 
 $GLOBALS['TL_DCA']['tl_metamodel_attribute']['fields']['tag_langcolumn'] = array

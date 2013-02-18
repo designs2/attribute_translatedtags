@@ -23,4 +23,6 @@ if (!defined('TL_ROOT'))
  */
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['typeOptions']['translatedtags']    = 'Translated tags';
 
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_langcolumn'] = array('Language column', 'Please specify which column holds the language code in ISO 639-1');
+
 ?>
