@@ -10,13 +10,25 @@
  * @package    MetaModels
  * @subpackage AttributeTranslatedTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Andreas Isaak <info@andreas-isaak.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
  * @filesource
  */
 
 /**
- * Fields
+ * Register the classes
  */
-$GLOBALS['TL_LANG']['tl_metamodel_attribute']['typeOptions']['translatedtags'] = 'Translated tags';
-$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_langcolumn']                = array('Language column', 'Please specify which column holds the language code in ISO 639-1');
+ClassLoader::addClasses(array
+(
+	'MetaModelAttributeTranslatedTags'              => 'system/modules/metamodelsattribute_translatedtags/MetaModelAttributeTranslatedTags.php',
+));
+
+
+/**
+ * Register the templates
+ */
+TemplateLoader::addFiles(array
+(
+	'mm_attr_translatedtags'              => 'system/modules/metamodelsattribute_translatedtags/templates',
+));

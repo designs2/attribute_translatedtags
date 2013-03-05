@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The MetaModels extension allows the creation of multiple collections of custom items,
  * each with its own unique set of selectable attributes, with attribute extendability.
@@ -6,23 +7,19 @@
  * data in each collection.
  *
  * PHP version 5
- * @package	   MetaModels
+ * @package    MetaModels
  * @subpackage AttributeTranslatedTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
  * @filesource
  */
-if (!defined('TL_ROOT'))
-{
-	die('You cannot access this file directly!');
-}
 
 /**
- * This is the MetaModelAttribute class for handling tag attributes.
+ * This is the MetaModelAttribute class for handling translated tag attributes.
  *
  * @package	   MetaModels
- * @subpackage AttributeTags
+ * @subpackage AttributeTranslatedTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  */
 class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements IMetaModelAttributeTranslated
@@ -360,5 +357,3 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		return $objFilterRule->getMatchingIds();
 	}
 }
-
-?>
