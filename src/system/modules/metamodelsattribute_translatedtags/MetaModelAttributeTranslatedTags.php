@@ -90,26 +90,35 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 					(tl_metamodel_tag_relation.att_id=?)
 					AND (tl_metamodel_tag_relation.value_id=%1$s.%2$s)
 				)
-				WHERE tl_metamodel_tag_relation.item_id IN (%3$s) GROUP BY %1$s.%2$s',
+				WHERE tl_metamodel_tag_relation.item_id IN (%3$s) 
+				GROUP BY %1$s.%2$s
+				ORDER BY %4$s',
 				$this->get('tag_table'), // 1
 				$this->get('tag_id'), // 2
-				implode(',', $arrIds) // 3
+				implode(',', $arrIds), // 3
+				$this->get('tag_sorting') // 4
 			))
 			->execute($this->get('id'));
 		} else if ($blnUsedOnly) {
 			$objValueIds = $objDB->prepare(sprintf('
 				SELECT value_id AS %1$s
 				FROM tl_metamodel_tag_relation
-				WHERE att_id=? GROUP BY value_id',
-				$this->get('tag_id')
+				WHERE att_id=? 
+				GROUP BY value_id
+				ORDER BY %2$s',
+				$this->get('tag_id'), //1
+				$this->get('tag_sorting') //2
 			))
 			->execute($this->get('id'));
 		} else {
 			$objValueIds = $objDB->prepare(sprintf('
 				SELECT %1$s.%2$s
-				FROM %1$s GROUP BY %1$s.%2$s',
+				FROM %1$s 
+				GROUP BY %1$s.%2$s
+				ORDER BY %3$s',
 				$this->get('tag_table'), // 1
-				$this->get('tag_id') // 2
+				$this->get('tag_id'), // 2
+				$this->get('tag_sorting') // 3
 			))
 			->execute();
 		}
@@ -134,11 +143,13 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 			SELECT %1$s.*
 			FROM %1$s
 			WHERE %1$s.%2$s IN (%3$s) AND (%1$s.%4$s=?)
-			GROUP BY %1$s.%2$s',
+			GROUP BY %1$s.%2$s
+			ORDER BY %5$s',
 			$this->get('tag_table'), // 1
 			$this->get('tag_id'), // 2
 			implode(',', $arrValueIds), // 3
-			$this->get('tag_langcolumn')
+			$this->get('tag_langcolumn'), //4
+			$this->get('tag_sorting') //5
 		))
 		->execute($strLangCode);
 	}
@@ -195,9 +206,6 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 					$arrReturn[$objValue->$strColNameAlias] = $objValue->$strColNameValue;
 				}
 			}
-
-			// finally sort the result by the value to have an alphabetical list.
-			asort($arrReturn);
 		}
 		return $arrReturn;
 	}
@@ -295,12 +303,14 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 					AND (tl_metamodel_tag_relation.value_id=%1$s.%3$s)
 					AND (%1$s.%5$s=?)
 				)
-				WHERE tl_metamodel_tag_relation.item_id IN (%4$s)',
+				WHERE tl_metamodel_tag_relation.item_id IN (%4$s)
+				ORDER BY %6$s',
 				$strTableName, // 1
 				$strMetaModelTableNameId, // 2
 				$strColNameId, // 3
 				implode(',', $arrIds), // 4
-				$strColNameLangCode // 5
+				$strColNameLangCode, // 5
+				$strSortColumn //6
 			))
 			->execute($this->get('id'), $strLangCode);
 			while ($objValue->next())
