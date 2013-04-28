@@ -90,9 +90,9 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 					(tl_metamodel_tag_relation.att_id=?)
 					AND (tl_metamodel_tag_relation.value_id=%1$s.%2$s)
 				)
-				WHERE tl_metamodel_tag_relation.item_id IN (%3$s) 
+				WHERE tl_metamodel_tag_relation.item_id IN (%3$s)
 				GROUP BY %1$s.%2$s
-				ORDER BY %4$s',
+				ORDER BY %1$s.%4$s',
 				$this->get('tag_table'), // 1
 				$this->get('tag_id'), // 2
 				implode(',', $arrIds), // 3
@@ -103,17 +103,19 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 			$objValueIds = $objDB->prepare(sprintf('
 				SELECT value_id AS %1$s
 				FROM tl_metamodel_tag_relation
-				WHERE att_id=? 
+				RIGHT JOIN %3$s ON(tl_metamodel_tag_relation.value_id=%3$s.%1$s)
+				WHERE att_id=?
 				GROUP BY value_id
-				ORDER BY %2$s',
+				ORDER BY %3$s.%2$s',
 				$this->get('tag_id'), //1
-				$this->get('tag_sorting') //2
+				$this->get('tag_sorting'), //2
+				$this->get('tag_table') // 3
 			))
 			->execute($this->get('id'));
 		} else {
 			$objValueIds = $objDB->prepare(sprintf('
 				SELECT %1$s.%2$s
-				FROM %1$s 
+				FROM %1$s
 				GROUP BY %1$s.%2$s
 				ORDER BY %3$s',
 				$this->get('tag_table'), // 1
