@@ -13,5 +13,6 @@
 
 CREATE TABLE `tl_metamodel_attribute` (
   `tag_langcolumn` varchar(255) NOT NULL default '',
+  `tag_srctable` varchar(255) NOT NULL default '',
+  `tag_srcsorting` varchar(255) NOT NULL default '',
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-

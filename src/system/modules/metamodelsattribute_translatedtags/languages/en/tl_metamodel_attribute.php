@@ -10,6 +10,7 @@
  * @package    MetaModels
  * @subpackage AttributeTranslatedTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Christian de la Haye <service@delahaye.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
  * @filesource
@@ -20,3 +21,5 @@
  */
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['typeOptions']['translatedtags'] = 'Translated tags';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_langcolumn']                = array('Language column', 'Please specify which column holds the language code in ISO 639-1');
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_srctable']                  = array('Untranslated table for sorting', 'Please specify the table that provides the sorting column.');
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_srcsorting']                = array('Sorting column', 'Please specify which column of the untranslated table shall be used for sorting.');
