@@ -23,7 +23,7 @@
 ClassLoader::addClasses(array
 (
 	'MetaModelAttributeTranslatedTags'              => 'system/modules/metamodelsattribute_translatedtags/MetaModelAttributeTranslatedTags.php',
-	'TableMetaModelsAttributeTranslatedTags'        => 'system/modules/metamodelsattribute_tags/TableMetaModelsAttributeTranslatedTags.php',
+	'TableMetaModelsAttributeTranslatedTags'        => 'system/modules/metamodelsattribute_translatedtags/TableMetaModelsAttributeTranslatedTags.php',
 ));
 
 
