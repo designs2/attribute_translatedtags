@@ -8,12 +8,11 @@
  *
  * @license http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  *
- * last-updated: 2013-05-13T22:13:46+02:00
+ * last-updated: 2013-05-13T23:10:20+02:00
  */
 
-
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_langcolumn']['0']           = 'Sprachenspalte';
-$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_langcolumn']['1']           = 'Bitte angeben, welche Spalte den Sprach-Code in ISO 639-1 enthält';
+$GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_langcolumn']['1']           = 'Bitte angeben, welche Spalte den Sprachcode nach ISO 639-1 enthält.';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_srcsorting']['0']           = 'Sortierspalte';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_srcsorting']['1']           = 'Wählen Sie bitte, welche Spalte der noch nicht übersetzten Tabelle für die Sortierung verwendet werden soll.';
 $GLOBALS['TL_LANG']['tl_metamodel_attribute']['tag_srctable']['0']             = 'Nicht übersetzte Tabelle für die Sortierung.';
