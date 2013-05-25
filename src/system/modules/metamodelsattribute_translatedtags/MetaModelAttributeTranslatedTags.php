@@ -74,7 +74,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	 *
 	 * @return int[] a list of all matching value ids.
 	 */
-	protected function getValueIds($arrIds, $blnUsedOnly)
+	protected function getValueIds($arrIds, $blnUsedOnly, &$arrCount = null)
 	{
 		if ($arrIds === array())
 		{
@@ -86,7 +86,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		if ($arrIds !== NULL)
 		{
 			$objValueIds = $objDB->prepare(sprintf('
-				SELECT %1$s.%2$s %6$s
+				SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.%2$s %6$s, 
 				FROM %1$s
 				%8$s
 				LEFT JOIN tl_metamodel_tag_relation ON (
@@ -108,7 +108,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 			->execute($this->get('id'));
 		} else if ($blnUsedOnly) {
 			$objValueIds = $objDB->prepare(sprintf('
-				SELECT value_id AS %1$s %5$s
+				SELECT COUNT(value_id) as mm_count, value_id AS %1$s %5$s
 				FROM tl_metamodel_tag_relation
 				RIGHT JOIN %3$s ON(tl_metamodel_tag_relation.value_id=%3$s.%1$s)
 				%7$s
@@ -126,7 +126,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 			->execute($this->get('id'));
 		} else {
 			$objValueIds = $objDB->prepare(sprintf('
-				SELECT %1$s.%2$s %5$s
+				SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.%2$s %5$s
 				FROM %1$s
 				%7$s
 				%4$s
@@ -142,7 +142,22 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 			))
 			->execute();
 		}
-		return $objValueIds->fetchEach($this->get('tag_id'));
+		
+		$arrReturn = array();
+		$strField = $this->get('tag_id');
+		
+		while ($objValueIds->next())
+		{			
+			$intID = $objValueIds->$strField;
+			
+			$arrReturn = $intID;			
+			if(is_array($arrCount))
+			{				
+				$arrCount[$intID] = $objValueIds->mm_count;
+			}
+		}
+		
+		return $arrReturn;
 	}
 
 	/**
@@ -196,14 +211,14 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	 * Fetch filter options from foreign table.
 	 *
 	 */
-	public function getFilterOptions($arrIds, $usedOnly)
+	public function getFilterOptions($arrIds, $usedOnly, &$arrCount = null)
 	{
 		$arrReturn = array();
 
 		if ($this->get('tag_table') && ($strColNameId = $this->get('tag_id')))
 		{
 			// fetch the value ids
-			$arrValueIds = $this->getValueIds($arrIds, $usedOnly);
+			$arrValueIds = $this->getValueIds($arrIds, $usedOnly, $arrCount);
 			if (!count($arrValueIds))
 			{
 				return $arrReturn;
