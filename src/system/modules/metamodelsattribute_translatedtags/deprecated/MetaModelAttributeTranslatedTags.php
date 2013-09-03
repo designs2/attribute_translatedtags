@@ -7,16 +7,12 @@
  *
  * PHP version 5
  * @package    MetaModels
- * @subpackage AttributeTranslatedTags
+ * @subpackage Deprecated
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
  * @filesource
  */
 
-$GLOBALS['METAMODELS']['attributes']['translatedtags']['class'] = 'MetaModels\Attribute\TranslatedTags\TranslatedTags';
-$GLOBALS['METAMODELS']['attributes']['translatedtags']['image'] = 'system/modules/metamodelsattribute_translatedtags/html/tags.png';
-
-// non composerized Contao 2.X autoload support.
-$GLOBALS['MM_AUTOLOAD'][] = dirname(__DIR__);
-$GLOBALS['MM_AUTOLOAD'][] = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'deprecated';
+trigger_error('Usage of deprecated '. __FILE__, E_USER_DEPRECATED);
+class_alias('MetaModels\Attribute\TranslatedTags\TranslatedTags', 'MetaModelAttributeTranslatedTags');

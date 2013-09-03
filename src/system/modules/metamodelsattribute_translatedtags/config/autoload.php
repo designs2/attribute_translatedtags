@@ -22,8 +22,11 @@
  */
 ClassLoader::addClasses(array
 (
-	'MetaModelAttributeTranslatedTags'              => 'system/modules/metamodelsattribute_translatedtags/MetaModelAttributeTranslatedTags.php',
-	'TableMetaModelsAttributeTranslatedTags'        => 'system/modules/metamodelsattribute_translatedtags/TableMetaModelsAttributeTranslatedTags.php',
+	'MetaModels\Attribute\TranslatedTags\TranslatedTags' => 'system/modules/metamodelsattribute_translatedtags/MetaModels/Attribute/TranslatedTags/TranslatedTags.php',
+	'MetaModels\Dca\AttributeTranslatedTags'             => 'system/modules/metamodelsattribute_translatedtags/MetaModels/Dca/AttributeTranslatedTags.php',
+
+	'MetaModelAttributeTranslatedTags'              => 'system/modules/metamodelsattribute_translatedtags/deprecated/MetaModelAttributeTranslatedTags.php',
+	'TableMetaModelsAttributeTranslatedTags'        => 'system/modules/metamodelsattribute_translatedtags/deprecated/TableMetaModelsAttributeTranslatedTags.php',
 ));
 
 

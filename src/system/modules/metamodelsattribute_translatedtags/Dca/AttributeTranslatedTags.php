@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The MetaModels extension allows the creation of multiple collections of custom items,
  * each with its own unique set of selectable attributes, with attribute extendability.
@@ -15,24 +14,32 @@
  * @filesource
  */
 
+namespace MetaModels\Dca;
+
+use DcGeneral\DataContainerInterface;
+
 /**
- * Supplementary class for handling DCA information for select attributes.
+ * Supplementary class for handling DCA information for translated tag attributes.
  *
- * @package	   MetaModels
+ * @package    MetaModels
  * @subpackage AttributeTranslatedTags
  * @author     Christian de la Haye <service@delahaye.de>
  */
-class TableMetaModelsAttributeTranslatedTags extends TableMetaModel
+class AttributeTranslatedTags extends MetaModel
 {
 
-	public function getSourceColumnNames(DataContainer $objDC)
+	public function getSourceColumnNames(DataContainerInterface $objDC)
 	{
-		$arrFields = array();
-
-		if (($objDC->getCurrentModel())
-		    && $this->Database->tableExists($objDC->getCurrentModel()->getProperty('tag_srctable')))
+		$arrFields   = array();
+		if (!($objDC->getEnvironment()->getCurrentModel()))
 		{
-			foreach ($this->Database->listFields($objDC->getCurrentModel()->getProperty('tag_srctable')) as $arrInfo)
+			return $arrFields;
+		}
+		$strSrcTable = $objDC->getEnvironment()->getCurrentModel()->getProperty('tag_srctable');
+
+		if (\Database::getInstance()->tableExists($strSrcTable))
+		{
+			foreach (\Database::getInstance()->listFields($strSrcTable) as $arrInfo)
 			{
 				if ($arrInfo['type'] != 'index')
 				{

@@ -16,25 +16,32 @@
  * @filesource
  */
 
+namespace MetaModels\Attribute\TranslatedTags;
+
+use MetaModels\Attribute\ITranslated;
+use MetaModels\Attribute\Tags\Tags;
+use MetaModels\Filter\Rules\SimpleQuery;
+
 /**
  * This is the MetaModelAttribute class for handling translated tag attributes.
  *
- * @package	   MetaModels
+ * @package    MetaModels
  * @subpackage AttributeTranslatedTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Christian de la Haye <service@delahaye.de>
  */
-class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements IMetaModelAttributeTranslated
+class TranslatedTags extends Tags
+	implements ITranslated
 {
 	/**
 	 * Get numbers of tag for the given ids.
 	 */
 	public function getTagCount($arrIds)
 	{
-		$objDB = Database::getInstance();
+		$objDB        = \Database::getInstance();
 		$strTableName = $this->get('tag_table');
 		$strColNameId = $this->get('tag_id');
-		$arrReturn = array();
+		$arrReturn    = array();
 
 		if ($strTableName && $strColNameId)
 		{
@@ -42,11 +49,11 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 			$strMetaModelTableNameId = $strMetaModelTableName.'_id';
 
 			$objValue = $objDB->prepare(sprintf(
-					'SELECT `item_id`, count(*) as count FROM `tl_metamodel_tag_relation`
-						WHERE att_id = ? AND item_id IN (%1$s) group BY `item_id`',
-					implode(',', $arrIds) // 1
-					))
-			->execute($this->get('id'));
+				'SELECT `item_id`, count(*) as count FROM `tl_metamodel_tag_relation`
+					WHERE att_id = ? AND item_id IN (%1$s) group BY `item_id`',
+				implode(',', $arrIds) // 1
+			))
+				->execute($this->get('id'));
 
 			while ($objValue->next())
 			{
@@ -63,7 +70,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 
 	/**
 	 * Fetch the ids of options optionally limited to the items with the provided ids.
-	 * NOTE: this does not take the actual availablility of an value in the current or
+	 * NOTE: this does not take the actual availability of an value in the current or
 	 * fallback languages into account.
 	 * This method is mainly intended as a helper for
 	 * {@see MetaModelAttributeTranslatedTags::getFilterOptions()}
@@ -71,6 +78,8 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	 * @param int[] $arrIds      a list of item ids that the result shall be limited to.
 	 *
 	 * @param bool  $blnUsedOnly do only return ids that have matches in the real table.
+	 *
+	 * @param null  $arrCount    Array to where the amount of items per tag shall be stored. May be null to return nothing.
 	 *
 	 * @return int[] a list of all matching value ids.
 	 */
@@ -82,11 +91,11 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		}
 
 		// first off, we need to determine the option ids in the foreign table.
-		$objDB = Database::getInstance();
+		$objDB = \Database::getInstance();
 		if ($arrIds !== NULL)
 		{
 			$objValueIds = $objDB->prepare(sprintf('
-				SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.%2$s %6$s, 
+				SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.%2$s %6$s,
 				FROM %1$s
 				%8$s
 				LEFT JOIN tl_metamodel_tag_relation ON (
@@ -105,7 +114,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				($this->get('tag_srcsorting') ? $this->get('tag_srctable').'.'.$this->get('tag_srcsorting').',' : false), //7
 				($this->get('tag_srctable') ? 'JOIN '.$this->get('tag_srctable').' ON '.$this->get('tag_table').'.'.$this->get('tag_id').'='.$this->get('tag_srctable').'.id' : false) //8
 			))
-			->execute($this->get('id'));
+				->execute($this->get('id'));
 		} else if ($blnUsedOnly) {
 			$objValueIds = $objDB->prepare(sprintf('
 				SELECT COUNT(value_id) as mm_count, value_id AS %1$s %5$s
@@ -123,7 +132,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				($this->get('tag_srcsorting') ? $this->get('tag_srctable').'.'.$this->get('tag_srcsorting').',' : false), //6
 				($this->get('tag_srctable') ? 'JOIN '.$this->get('tag_srctable').' ON '.$this->get('tag_table').'.'.$this->get('tag_id').'='.$this->get('tag_srctable').'.id' : false) //7
 			))
-			->execute($this->get('id'));
+				->execute($this->get('id'));
 		} else {
 			$objValueIds = $objDB->prepare(sprintf('
 				SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.%2$s %5$s
@@ -140,23 +149,23 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				($this->get('tag_srcsorting') ? $this->get('tag_srctable').'.'.$this->get('tag_srcsorting').',' : false), //6
 				($this->get('tag_srctable') ? 'JOIN '.$this->get('tag_srctable').' ON '.$this->get('tag_table').'.'.$this->get('tag_id').'='.$this->get('tag_srctable').'.id' : false) //7
 			))
-			->execute();
+				->execute();
 		}
-		
+
 		$arrReturn = array();
 		$strField = $this->get('tag_id');
-		
+
 		while ($objValueIds->next())
-		{			
+		{
 			$intID = $objValueIds->$strField;
-			
-			$arrReturn = $intID;			
+
+			$arrReturn = $intID;
 			if(is_array($arrCount))
-			{				
+			{
 				$arrCount[$intID] = $objValueIds->mm_count;
 			}
 		}
-		
+
 		return $arrReturn;
 	}
 
@@ -169,12 +178,12 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	 *
 	 * @param string $strLangCode the language code for which the values shall be retrieved.
 	 *
-	 * @return Database_Result a database result containing all matching values.
+	 * @return \Database\Result a database result containing all matching values.
 	 */
 	protected function getValues($arrValueIds, $strLangCode)
 	{
 		// now for the retrival, first with the real language.
-		return Database::getInstance()->prepare(sprintf('
+		return \Database::getInstance()->prepare(sprintf('
 			SELECT %1$s.* %7$s
 			FROM %1$s
 			%9$s
@@ -191,7 +200,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 			($this->get('tag_srcsorting') ? $this->get('tag_srctable').'.'.$this->get('tag_srcsorting').',' : false), //8
 			($this->get('tag_srctable') ? 'JOIN '.$this->get('tag_srctable').' ON '.$this->get('tag_table').'.'.$this->get('tag_id').'='.$this->get('tag_srctable').'.id' : false) //9
 		))
-		->execute($strLangCode);
+			->execute($strLangCode);
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -323,15 +332,15 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	 */
 	public function getTranslatedDataFor($arrIds, $strLangCode)
 	{
-		$objDB = Database::getInstance();
-		$strTableName = $this->get('tag_table');
-		$strColNameId = $this->get('tag_id');
+		$objDB              = \Database::getInstance();
+		$strTableName       = $this->get('tag_table');
+		$strColNameId       = $this->get('tag_id');
 		$strColNameLangCode = $this->get('tag_langcolumn');
-		$strSortColumn = $this->get('tag_sorting');
-		$strWhere = ($this->get('tag_where') ? html_entity_decode($this->get('tag_where')) : false);
-		$strTableNameSrc = $this->get('tag_srctable');
-		$strSortColumnSrc = ($this->get('tag_srcsorting') ? $this->get('tag_srcsorting') : 'id');
-		$arrReturn = array();
+		$strSortColumn      = $this->get('tag_sorting');
+		$strWhere           = ($this->get('tag_where') ? html_entity_decode($this->get('tag_where')) : false);
+		$strTableNameSrc    = $this->get('tag_srctable');
+		$strSortColumnSrc   = ($this->get('tag_srcsorting') ? $this->get('tag_srcsorting') : 'id');
+		$arrReturn          = array();
 
 		if ($strTableName && $strColNameId && $strColNameLangCode)
 		{
@@ -360,7 +369,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				($strTableNameSrc ? 'JOIN '.$strTableNameSrc.' ON ('.$strTableNameSrc.'.id='.$strTableName.'.'.$strColNameId.')' : false), //9
 				($strTableNameSrc ? 'srcsorting,' : false) //10
 			))
-			->execute($this->get('id'), $strLangCode);
+				->execute($this->get('id'), $strLangCode);
 			while ($objValue->next())
 			{
 
@@ -383,7 +392,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 	public function unsetValueFor($arrIds, $strLangCode)
 	{
 		// FIXME: unimplemented
-		throw new Exception('MetaModelAttributeTranslatedTags::unsetValueFor() is not yet implemented, please do it or find someone who can!', 1);
+		throw new \RuntimeException('MetaModelAttributeTranslatedTags::unsetValueFor() is not yet implemented, please do it or find someone who can!', 1);
 	}
 
 	/**
@@ -399,7 +408,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		$strColumn = $this->get('tag_column');
 		$strColAlias = $this->get('tag_alias') ? $this->get('tag_alias') : $strColNameId;
 
-		$objFilterRule = new MetaModelFilterRuleSimpleQuery(
+		$objFilterRule = new SimpleQuery(
 			sprintf('SELECT item_id FROM tl_metamodel_tag_relation WHERE value_id IN (SELECT DISTINCT %1$s FROM %2$s WHERE %3$s LIKE ? OR %6$s LIKE ?%4$s) AND att_id = %5$s',
 				$strColNameId,  //1
 				$strTableName,  //2
