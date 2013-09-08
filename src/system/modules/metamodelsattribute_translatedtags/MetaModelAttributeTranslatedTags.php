@@ -150,7 +150,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		{			
 			$intID = $objValueIds->$strField;
 			
-			$arrReturn = $intID;			
+			$arrReturn[] = $intID;			
 			if(is_array($arrCount))
 			{				
 				$arrCount[$intID] = $objValueIds->mm_count;
