@@ -86,7 +86,7 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		if ($arrIds !== NULL)
 		{
 			$objValueIds = $objDB->prepare(sprintf('
-				SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.%2$s %6$s, 
+				SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.%2$s %6$s 
 				FROM %1$s
 				%8$s
 				LEFT JOIN tl_metamodel_tag_relation ON (
