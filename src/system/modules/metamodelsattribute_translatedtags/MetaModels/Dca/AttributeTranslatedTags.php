@@ -25,8 +25,26 @@ use DcGeneral\DataContainerInterface;
  * @subpackage AttributeTranslatedTags
  * @author     Christian de la Haye <service@delahaye.de>
  */
-class AttributeTranslatedTags extends MetaModel
+class AttributeTranslatedTags extends AttributeTags
 {
+	/**
+	 * @var AttributeTags
+	 */
+	protected static $objInstance = null;
+
+	/**
+	 * Get the static instance.
+	 *
+	 * @static
+	 * @return AttributeTags
+	 */
+	public static function getInstance()
+	{
+		if (self::$objInstance == null) {
+			self::$objInstance = new AttributeTranslatedTags();
+		}
+		return self::$objInstance;
+	}
 
 	public function getSourceColumnNames(DataContainerInterface $objDC)
 	{
