@@ -80,13 +80,16 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 		{
 			return array();
 		}
+		
+		// Get name of the alias column
+		$strColNameAlias = $this->getAliasCol();
 
 		// first off, we need to determine the option ids in the foreign table.
 		$objDB = Database::getInstance();
 		if ($arrIds !== NULL)
 		{
 			$objValueIds = $objDB->prepare(sprintf('
-				SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.%2$s %6$s 
+				SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.%2$s, %1$s.%9$s %6$s
 				FROM %1$s
 				%8$s
 				LEFT JOIN tl_metamodel_tag_relation ON (
@@ -103,12 +106,13 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				($this->get('tag_where') ? 'AND ('.html_entity_decode($this->get('tag_where').')') : false), //5
 				($this->get('tag_srctable') ? ', '.$this->get('tag_srctable').'.*' : false), //6
 				($this->get('tag_srcsorting') ? $this->get('tag_srctable').'.'.$this->get('tag_srcsorting').',' : false), //7
-				($this->get('tag_srctable') ? 'JOIN '.$this->get('tag_srctable').' ON '.$this->get('tag_table').'.'.$this->get('tag_id').'='.$this->get('tag_srctable').'.id' : false) //8
+				($this->get('tag_srctable') ? 'JOIN '.$this->get('tag_srctable').' ON '.$this->get('tag_table').'.'.$this->get('tag_id').'='.$this->get('tag_srctable').'.id' : false), //8
+				$strColNameAlias //9
 			))
 			->execute($this->get('id'));
 		} else if ($blnUsedOnly) {
 			$objValueIds = $objDB->prepare(sprintf('
-				SELECT COUNT(value_id) as mm_count, value_id AS %1$s %5$s
+				SELECT COUNT(value_id) as mm_count, value_id AS %1$s, %3$s.%8$s %5$s
 				FROM tl_metamodel_tag_relation
 				RIGHT JOIN %3$s ON(tl_metamodel_tag_relation.value_id=%3$s.%1$s)
 				%7$s
@@ -121,12 +125,13 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				($this->get('tag_where') ? 'AND ('.html_entity_decode($this->get('tag_where').')') : false), //4
 				($this->get('tag_srctable') ? ', '.$this->get('tag_srctable').'.*' : false), //5
 				($this->get('tag_srcsorting') ? $this->get('tag_srctable').'.'.$this->get('tag_srcsorting').',' : false), //6
-				($this->get('tag_srctable') ? 'JOIN '.$this->get('tag_srctable').' ON '.$this->get('tag_table').'.'.$this->get('tag_id').'='.$this->get('tag_srctable').'.id' : false) //7
+				($this->get('tag_srctable') ? 'JOIN '.$this->get('tag_srctable').' ON '.$this->get('tag_table').'.'.$this->get('tag_id').'='.$this->get('tag_srctable').'.id' : false), //7
+				$strColNameAlias //8
 			))
 			->execute($this->get('id'));
 		} else {
 			$objValueIds = $objDB->prepare(sprintf('
-				SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.%2$s %5$s
+				SELECT COUNT(%1$s.%2$s) as mm_count, %1$s.%2$s, %1$s.%8$s %5$s
 				FROM %1$s
 				%7$s
 				%4$s
@@ -138,25 +143,34 @@ class MetaModelAttributeTranslatedTags extends MetaModelAttributeTags implements
 				($this->get('tag_where') ? 'WHERE ('.html_entity_decode($this->get('tag_where').')') : false), //4
 				($this->get('tag_srctable') ? ', '.$this->get('tag_srctable').'.*' : false), //5
 				($this->get('tag_srcsorting') ? $this->get('tag_srctable').'.'.$this->get('tag_srcsorting').',' : false), //6
-				($this->get('tag_srctable') ? 'JOIN '.$this->get('tag_srctable').' ON '.$this->get('tag_table').'.'.$this->get('tag_id').'='.$this->get('tag_srctable').'.id' : false) //7
+				($this->get('tag_srctable') ? 'JOIN '.$this->get('tag_srctable').' ON '.$this->get('tag_table').'.'.$this->get('tag_id').'='.$this->get('tag_srctable').'.id' : false), //7
+				$strColNameAlias //8
 			))
 			->execute();
 		}
-		
+
 		$arrReturn = array();
 		$strField = $this->get('tag_id');
 		
 		while ($objValueIds->next())
 		{			
 			$intID = $objValueIds->$strField;
+			$strAlias = $objValueIds->$strColNameAlias;
 			
 			$arrReturn[] = $intID;			
+			
+			// Count.
 			if(is_array($arrCount))
-			{				
-				$arrCount[$intID] = $objValueIds->mm_count;
+			{
+				$objCount = $objDB
+						->prepare('SELECT COUNT(value_id) as mm_count FROM tl_metamodel_tag_relation WHERE att_id=? AND value_id=?')
+						->execute($this->get('id'), $intID);
+				
+				$arrCount[$intID] = $objCount->mm_count;
+				$arrCount[$strAlias] = $objCount->mm_count;
 			}
 		}
-		
+
 		return $arrReturn;
 	}
 
