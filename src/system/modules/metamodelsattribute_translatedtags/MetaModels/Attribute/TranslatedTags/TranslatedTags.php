@@ -121,8 +121,8 @@ class TranslatedTags extends Tags
 				FROM tl_metamodel_tag_relation
 				RIGHT JOIN %3$s ON(tl_metamodel_tag_relation.value_id=%3$s.%1$s)
 				%7$s
-				WHERE att_id=? %4$s
-				GROUP BY value_id
+				WHERE tl_metamodel_tag_relation.att_id=? %4$s
+				GROUP BY tl_metamodel_tag_relation.value_id
 				ORDER BY %6$s %3$s.%2$s',
 				$this->get('tag_id'), //1
 				$this->get('tag_sorting'), //2
