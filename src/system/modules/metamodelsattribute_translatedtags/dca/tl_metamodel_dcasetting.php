@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The MetaModels extension allows the creation of multiple collections of custom items,
  * each with its own unique set of selectable attributes, with attribute extendability.
@@ -17,13 +16,16 @@
 
 $GLOBALS['TL_DCA']['tl_metamodel_dcasetting']['metasubselectpalettes']['attr_id']['translatedtags'] = array
 (
-	'presentation' => array(
+	'presentation' => array
+	(
 		'tl_class',
 	),
-	'functions'  => array(
+	'functions'    => array
+	(
 		'mandatory'
 	),
-	'overview' => array(
+	'overview' => array
+	(
 		'filterable',
 		'searchable',
 	)

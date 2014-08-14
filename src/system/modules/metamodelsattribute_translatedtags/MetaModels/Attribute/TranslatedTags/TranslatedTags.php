@@ -479,7 +479,7 @@ class TranslatedTags extends Tags
 	 */
 	public function unsetValueFor($arrIds, $strLangCode)
 	{
-		// FIXME: unimplemented
+		// FIXME: unimplemented.
 		throw new \RuntimeException(
 			'MetaModelAttributeTranslatedTags::unsetValueFor() is not yet implemented, please do it or find someone who can!',
 			1
