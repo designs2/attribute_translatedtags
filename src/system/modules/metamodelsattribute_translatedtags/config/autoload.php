@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The MetaModels extension allows the creation of multiple collections of custom items,
  * each with its own unique set of selectable attributes, with attribute extendability.
@@ -16,19 +15,6 @@
  * @license    LGPL.
  * @filesource
  */
-
-/**
- * Register the classes
- */
-ClassLoader::addClasses(array
-(
-	'MetaModels\Attribute\TranslatedTags\TranslatedTags' => 'system/modules/metamodelsattribute_translatedtags/MetaModels/Attribute/TranslatedTags/TranslatedTags.php',
-	'MetaModels\Dca\AttributeTranslatedTags'             => 'system/modules/metamodelsattribute_translatedtags/MetaModels/Dca/AttributeTranslatedTags.php',
-
-	'MetaModelAttributeTranslatedTags'              => 'system/modules/metamodelsattribute_translatedtags/deprecated/MetaModelAttributeTranslatedTags.php',
-	'TableMetaModelsAttributeTranslatedTags'        => 'system/modules/metamodelsattribute_translatedtags/deprecated/TableMetaModelsAttributeTranslatedTags.php',
-));
-
 
 /**
  * Register the templates

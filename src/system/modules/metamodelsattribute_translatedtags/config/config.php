@@ -15,11 +15,8 @@
  */
 
 $GLOBALS['METAMODELS']['attributes']['translatedtags']['class'] = 'MetaModels\Attribute\TranslatedTags\TranslatedTags';
-$GLOBALS['METAMODELS']['attributes']['translatedtags']['image'] = 'system/modules/metamodelsattribute_translatedtags/html/tags.png';
-
-// non composerized Contao 2.X autoload support.
-$GLOBALS['MM_AUTOLOAD'][] = dirname(__DIR__);
-$GLOBALS['MM_AUTOLOAD'][] = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'deprecated';
+$GLOBALS['METAMODELS']['attributes']['translatedtags']['image'] =
+	'system/modules/metamodelsattribute_translatedtags/html/tags.png';
 
 $GLOBALS['TL_EVENTS'][\ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent::NAME][] =
 	'MetaModels\DcGeneral\Events\Table\Attribute\Translated\Tags\Subscriber::registerEvents';
