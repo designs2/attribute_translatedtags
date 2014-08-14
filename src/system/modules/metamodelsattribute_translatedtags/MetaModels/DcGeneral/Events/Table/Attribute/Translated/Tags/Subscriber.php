@@ -7,7 +7,7 @@
  *
  * PHP version 5
  * @package    MetaModels
- * @subpackage Core
+ * @subpackage AttributeTranslatedTags
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
@@ -19,14 +19,12 @@ namespace MetaModels\DcGeneral\Events\Table\Attribute\Translated\Tags;
 use ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\Event\GetPropertyOptionsEvent;
 use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
-use MetaModels\DcGeneral\Events\BaseSubscriber;
-use MetaModels\Factory;
 
 /**
  * Handle events for tl_metamodel_attribute.alias_fields.attr_id.
  */
-class PropertyAttribute
-	extends \MetaModels\DcGeneral\Events\Table\Attribute\Tags\PropertyAttribute
+class Subscriber
+	extends \MetaModels\DcGeneral\Events\Table\Attribute\Tags\Subscriber
 {
 	/**
 	 * Register all listeners to handle creation of a data container.
@@ -97,18 +95,18 @@ class PropertyAttribute
 	 */
 	public static function getSourceColumnNames(GetPropertyOptionsEvent $event)
 	{
-		$model   = $event->getModel();
-		$table   = $model->getProperty('select_srctable');
-		$databse = \Database::getInstance();
+		$model    = $event->getModel();
+		$table    = $model->getProperty('select_srctable');
+		$database = \Database::getInstance();
 
-		if (!$table || !$databse->tableExists($table))
+		if (!$table || !$database->tableExists($table))
 		{
 			return;
 		}
 
 		$result = array();
 
-		foreach ($databse->listFields($table) as $arrInfo)
+		foreach ($database->listFields($table) as $arrInfo)
 		{
 			if ($arrInfo['type'] != 'index')
 			{
