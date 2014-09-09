@@ -19,6 +19,7 @@ $GLOBALS['TL_DCA']['tl_metamodel_dcasetting']['metasubselectpalettes']['attr_id'
 	'presentation' => array
 	(
 		'tl_class',
+		'tag_as_wizard'
 	),
 	'functions'    => array
 	(
