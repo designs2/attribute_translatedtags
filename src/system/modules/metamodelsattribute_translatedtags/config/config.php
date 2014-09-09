@@ -16,7 +16,7 @@
 
 $GLOBALS['METAMODELS']['attributes']['translatedtags']['class'] = 'MetaModels\Attribute\TranslatedTags\TranslatedTags';
 $GLOBALS['METAMODELS']['attributes']['translatedtags']['image'] =
-	'system/modules/metamodelsattribute_translatedtags/html/tags.png';
+    'system/modules/metamodelsattribute_translatedtags/html/tags.png';
 
 $GLOBALS['TL_EVENTS'][\ContaoCommunityAlliance\Contao\EventDispatcher\Event\CreateEventDispatcherEvent::NAME][] =
-	'MetaModels\DcGeneral\Events\Table\Attribute\Translated\Tags\Subscriber::registerEvents';
+    'MetaModels\DcGeneral\Events\Table\Attribute\Translated\Tags\Subscriber::registerEvents';
