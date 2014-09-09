@@ -173,7 +173,9 @@ class TranslatedTags extends Tags implements ITranslated
                 $this->get('tag_table'),   // 1
                 $this->get('tag_id'),      // 2
                 $this->get('tag_sorting'), // 3
-                $where,                    // 4
+                $where
+                    ? 'WHERE ' . substr($where, 4)
+                    : '',                  // 4
                 $fields,                   // 5
                 $sorting,                  // 6
                 $join,                     // 7
