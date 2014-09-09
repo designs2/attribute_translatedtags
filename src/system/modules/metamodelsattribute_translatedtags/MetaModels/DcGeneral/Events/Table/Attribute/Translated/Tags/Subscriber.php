@@ -24,8 +24,7 @@ use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
 /**
  * Handle events for tl_metamodel_attribute.alias_fields.attr_id.
  */
-class Subscriber
-    extends \MetaModels\DcGeneral\Events\Table\Attribute\Tags\Subscriber
+class Subscriber extends \MetaModels\DcGeneral\Events\Table\Attribute\Tags\Subscriber
 {
     /**
      * Register all listeners to handle creation of a data container.
@@ -55,8 +54,7 @@ class Subscriber
     public static function registerTableMetaModelAttributeEvents(BuildDataDefinitionEvent $event)
     {
         static $registered;
-        if ($registered)
-        {
+        if ($registered) {
             return;
         }
         $registered = true;
@@ -100,17 +98,14 @@ class Subscriber
         $table    = $model->getProperty('select_srctable');
         $database = \Database::getInstance();
 
-        if (!$table || !$database->tableExists($table))
-        {
+        if (!$table || !$database->tableExists($table)) {
             return;
         }
 
         $result = array();
 
-        foreach ($database->listFields($table) as $arrInfo)
-        {
-            if ($arrInfo['type'] != 'index')
-            {
+        foreach ($database->listFields($table) as $arrInfo) {
+            if ($arrInfo['type'] != 'index') {
                 $result[$arrInfo['name']] = $arrInfo['name'];
             }
         }
