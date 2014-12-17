@@ -443,7 +443,7 @@ class TranslatedTags extends Tags implements ITranslated
                 ->execute($this->get('id'), $strLangCode);
             while ($objValue->next()) {
 
-                if (!$arrReturn[$objValue->$strMetaModelTableNameId]) {
+                if (!isset($arrReturn[$objValue->$strMetaModelTableNameId])) {
                     $arrReturn[$objValue->$strMetaModelTableNameId] = array();
                 }
                 $arrData = $objValue->row();
