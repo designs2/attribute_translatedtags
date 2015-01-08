@@ -540,17 +540,12 @@ class TranslatedTags extends Tags implements ITranslated
 
     /**
      * {@inheritDoc}
-     *
-     * @throws \RuntimeException as it is currently unimplemented.
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function unsetValueFor($arrIds, $strLangCode)
     {
-        // FIXME: unsetValueFor() is unimplemented.
-        throw new \RuntimeException(
-            'MetaModelAttributeTranslatedTags::unsetValueFor() is not yet implemented, ' .
-            'please do it or find someone who can!',
-            1
-        );
+        // We can not simply unset only one language. When un-setting, all languages will disappear.
+        $this->unsetDataFor($arrIds);
     }
 
     /**
