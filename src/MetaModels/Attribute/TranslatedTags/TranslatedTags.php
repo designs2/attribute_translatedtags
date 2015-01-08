@@ -479,8 +479,7 @@ class TranslatedTags extends Tags implements ITranslated
             return array();
         }
 
-        $strMetaModelTableName   = $this->getMetaModel()->getTableName();
-        $strMetaModelTableNameId = $strMetaModelTableName.'_id';
+        $metaModelItemId = $this->getMetaModel()->getTableName() . '_id';
 
         $join  = false;
         $field = false;
@@ -514,7 +513,7 @@ class TranslatedTags extends Tags implements ITranslated
             ORDER BY %10$s %6$s',
             // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
             $strTableName,                   // 1
-            $strMetaModelTableNameId,        // 2
+            $metaModelItemId,                // 2
             $strColNameId,                   // 3
             implode(',', $arrIds),           // 4
             $strColNameLangCode,             // 5
@@ -526,14 +525,14 @@ class TranslatedTags extends Tags implements ITranslated
             // @codingStandardsIgnoreEnd
         ))
             ->execute($this->get('id'), $strLangCode);
-        while ($objValue->next()) {
 
-            if (!isset($arrReturn[$objValue->$strMetaModelTableNameId])) {
-                $arrReturn[$objValue->$strMetaModelTableNameId] = array();
+        while ($objValue->next()) {
+            if (!isset($arrReturn[$objValue->$metaModelItemId])) {
+                $arrReturn[$objValue->$metaModelItemId] = array();
             }
             $arrData = $objValue->row();
-            unset($arrData[$strMetaModelTableNameId]);
-            $arrReturn[$objValue->$strMetaModelTableNameId][$objValue->$strColNameId] = $arrData;
+            unset($arrData[$metaModelItemId]);
+            $arrReturn[$objValue->$metaModelItemId][$objValue->$strColNameId] = $arrData;
         }
 
         return $arrReturn;
