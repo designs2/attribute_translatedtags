@@ -475,63 +475,65 @@ class TranslatedTags extends Tags implements ITranslated
         $strSortColumn      = $this->getSortingColumn();
         $arrReturn          = array();
 
-        if ($strTableName && $strColNameId && $strColNameLangCode) {
-            $strMetaModelTableName   = $this->getMetaModel()->getTableName();
-            $strMetaModelTableNameId = $strMetaModelTableName.'_id';
+        if (!($strTableName && $strColNameId && $strColNameLangCode)) {
+            return array();
+        }
 
-            $join  = false;
-            $field = false;
-            $where = $this->getWhereColumn()
-                ? 'AND (' . $this->getWhereColumn() . ')'
-                : false;
-            if ($this->getTagSortSourceTable()) {
-                $join = sprintf(
-                    'JOIN %s ON %s.%s=%s.id',
-                    $this->getTagSortSourceTable(),
-                    $this->getTagSource(),
-                    $this->getIdColumn(),
-                    $this->getTagSortSourceTable()
-                );
+        $strMetaModelTableName   = $this->getMetaModel()->getTableName();
+        $strMetaModelTableNameId = $strMetaModelTableName.'_id';
 
-                if ($this->getTagSortSourceColumn(true)) {
-                    $field = ', ' . $this->getTagSortSourceColumn(true);
-                }
+        $join  = false;
+        $field = false;
+        $where = $this->getWhereColumn()
+            ? 'AND (' . $this->getWhereColumn() . ')'
+            : false;
+        if ($this->getTagSortSourceTable()) {
+            $join = sprintf(
+                'JOIN %s ON %s.%s=%s.id',
+                $this->getTagSortSourceTable(),
+                $this->getTagSource(),
+                $this->getIdColumn(),
+                $this->getTagSortSourceTable()
+            );
+
+            if ($this->getTagSortSourceColumn(true)) {
+                $field = ', ' . $this->getTagSortSourceColumn(true);
             }
+        }
 
-            $objValue = $objDB->prepare(sprintf(
-                'SELECT %1$s.*, tl_metamodel_tag_relation.item_id AS %2$s %8$s
-                FROM %1$s
-                LEFT JOIN tl_metamodel_tag_relation ON (
-                    (tl_metamodel_tag_relation.att_id=?)
-                    AND (tl_metamodel_tag_relation.value_id=%1$s.%3$s)
-                    AND (%1$s.%5$s=?)
-                )
-                %9$s
-                WHERE tl_metamodel_tag_relation.item_id IN (%4$s) %7$s
-                ORDER BY %10$s %6$s',
-                // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                $strTableName,                   // 1
-                $strMetaModelTableNameId,        // 2
-                $strColNameId,                   // 3
-                implode(',', $arrIds),           // 4
-                $strColNameLangCode,             // 5
-                $strSortColumn,                  // 6
-                $where,                          // 7
-                $field,                          // 8
-                $join,                           // 9
-                ($field ? 'srcsorting,' : false) //10
-                // @codingStandardsIgnoreEnd
-            ))
-                ->execute($this->get('id'), $strLangCode);
-            while ($objValue->next()) {
+        $objValue = $objDB->prepare(sprintf(
+            'SELECT %1$s.*, tl_metamodel_tag_relation.item_id AS %2$s %8$s
+            FROM %1$s
+            LEFT JOIN tl_metamodel_tag_relation ON (
+                (tl_metamodel_tag_relation.att_id=?)
+                AND (tl_metamodel_tag_relation.value_id=%1$s.%3$s)
+                AND (%1$s.%5$s=?)
+            )
+            %9$s
+            WHERE tl_metamodel_tag_relation.item_id IN (%4$s) %7$s
+            ORDER BY %10$s %6$s',
+            // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
+            $strTableName,                   // 1
+            $strMetaModelTableNameId,        // 2
+            $strColNameId,                   // 3
+            implode(',', $arrIds),           // 4
+            $strColNameLangCode,             // 5
+            $strSortColumn,                  // 6
+            $where,                          // 7
+            $field,                          // 8
+            $join,                           // 9
+            ($field ? 'srcsorting,' : false) //10
+            // @codingStandardsIgnoreEnd
+        ))
+            ->execute($this->get('id'), $strLangCode);
+        while ($objValue->next()) {
 
-                if (!isset($arrReturn[$objValue->$strMetaModelTableNameId])) {
-                    $arrReturn[$objValue->$strMetaModelTableNameId] = array();
-                }
-                $arrData = $objValue->row();
-                unset($arrData[$strMetaModelTableNameId]);
-                $arrReturn[$objValue->$strMetaModelTableNameId][$objValue->$strColNameId] = $arrData;
+            if (!isset($arrReturn[$objValue->$strMetaModelTableNameId])) {
+                $arrReturn[$objValue->$strMetaModelTableNameId] = array();
             }
+            $arrData = $objValue->row();
+            unset($arrData[$strMetaModelTableNameId]);
+            $arrReturn[$objValue->$strMetaModelTableNameId][$objValue->$strColNameId] = $arrData;
         }
 
         return $arrReturn;
