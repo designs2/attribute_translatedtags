@@ -12,6 +12,7 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Andreas Isaak <info@andreas-isaak.de>
  * @author     Christian de la Haye <service@delahaye.de>
+ * @author     David Maack <david.maack@arcor.de>
  * @copyright  The MetaModels team.
  * @license    LGPL.
  * @filesource
