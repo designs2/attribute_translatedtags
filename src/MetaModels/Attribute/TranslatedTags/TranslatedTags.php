@@ -21,6 +21,7 @@
 
 namespace MetaModels\Attribute\TranslatedTags;
 
+use Contao\Database\Result;
 use MetaModels\Attribute\ITranslated;
 use MetaModels\Attribute\Tags\Tags;
 use MetaModels\Filter\Rules\SimpleQuery;
@@ -115,6 +116,54 @@ class TranslatedTags extends Tags implements ITranslated
             }
         }
         return $arrReturn;
+    }
+
+    /**
+     * Convert the value ids to a result array.
+     *
+     * @param Result     $valueResult The database result.
+     *
+     * @param null|array $counter     The destination for the counter values.
+     *
+     * @return array
+     */
+    protected function convertValueIds($valueResult, &$counter = null)
+    {
+        $result      = array();
+        $aliases     = array();
+        $idColumn    = $this->getIdColumn();
+        $aliasColumn = $this->getAliasColumn();
+        while ($valueResult->next()) {
+            $valueId           = $valueResult->$idColumn;
+            $aliases[$valueId] = $valueResult->$aliasColumn;
+            $result[]          = $valueId;
+        }
+
+        if ($counter !== null) {
+            $objCount = $this
+                ->getDatabase()
+                ->prepare(
+                    sprintf(
+                        'SELECT value_id, COUNT(value_id) as mm_count
+                        FROM tl_metamodel_tag_relation
+                        WHERE att_id=?
+                        AND value_id IN %s
+                        GROUP BY item_id',
+                        implode(',', array_fill(0, count($result), '?'))
+                    )
+                )
+                ->execute(array_merge(array($this->get('id')), $result));
+            /** @noinspection PhpUndefinedFieldInspection */
+            $amount = $objCount->mm_count;
+            /** @noinspection PhpUndefinedFieldInspection */
+            $valueId = $objCount->value_id;
+            $alias   = $aliases[$valueId];
+
+            $counter[$valueId] = $amount;
+            $counter[$alias]   = $amount;
+        }
+
+        return $result;
     }
 
     /**
@@ -239,32 +288,7 @@ class TranslatedTags extends Tags implements ITranslated
                 ->execute();
         }
 
-        $arrReturn = array();
-        $strField  = $this->getIdColumn();
-
-        while ($objValueIds->next()) {
-            $intID    = $objValueIds->$strField;
-            $strAlias = $objValueIds->$strColNameAlias;
-
-            $arrReturn[] = $intID;
-
-            // Count.
-            if (is_array($arrCount)) {
-                $objCount = $objDB
-                        ->prepare(
-                            'SELECT COUNT(value_id) as mm_count
-                            FROM tl_metamodel_tag_relation
-                            WHERE att_id=?
-                                AND value_id=?'
-                        )
-                        ->execute($this->get('id'), $intID);
-
-                $arrCount[$intID]    = $objCount->mm_count;
-                $arrCount[$strAlias] = $objCount->mm_count;
-            }
-        }
-
-        return $arrReturn;
+        return $this->convertValueIds($objValueIds, $arrCount);
     }
 
     /**
