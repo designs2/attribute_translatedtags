@@ -340,38 +340,42 @@ class TranslatedTags extends Tags implements ITranslated
      */
     public function getFilterOptions($arrIds, $usedOnly, &$arrCount = null)
     {
-        $arrReturn = array();
+        if (!$this->getTagSource() && $this->getIdColumn()) {
+            return array();
+        }
 
-        if ($this->getTagSource() && ($strColNameId = $this->getIdColumn())) {
-            // Fetch the value ids.
-            $arrValueIds = $this->getValueIds($arrIds, $usedOnly, $arrCount);
-            if (!count($arrValueIds)) {
-                return $arrReturn;
-            }
+        $arrReturn    = array();
+        $strColNameId = $this->getIdColumn();
 
-            $strColNameValue = $this->getValueColumn();
-            $strColNameAlias = $this->getAliasColumn();
+        // Fetch the value ids.
+        $arrValueIds = $this->getValueIds($arrIds, $usedOnly, $arrCount);
+        if (!count($arrValueIds)) {
+            return $arrReturn;
+        }
 
-            // Now for the retrival, first with the real language.
-            $objValue             = $this->getValues($arrValueIds, $this->getMetaModel()->getActiveLanguage());
-            $arrValueIdsRetrieved = array();
+        $strColNameValue = $this->getValueColumn();
+        $strColNameAlias = $this->getAliasColumn();
+
+        // Now for the retrieval, first with the real language.
+        $objValue             = $this->getValues($arrValueIds, $this->getMetaModel()->getActiveLanguage());
+        $arrValueIdsRetrieved = array();
+        while ($objValue->next()) {
+            $arrValueIdsRetrieved[]                 = $objValue->$strColNameId;
+            $arrReturn[$objValue->$strColNameAlias] = $objValue->$strColNameValue;
+        }
+        // Determine missing ids.
+        $arrValueIds = array_diff($arrValueIds, $arrValueIdsRetrieved);
+        // If there are missing ids and the fallback language is different than the current language, then fetch
+        // those now.
+        if ($arrValueIds
+            && ($this->getMetaModel()->getFallbackLanguage() != $this->getMetaModel()->getActiveLanguage())
+        ) {
+            $objValue = $this->getValues($arrValueIds, $this->getMetaModel()->getFallbackLanguage());
             while ($objValue->next()) {
-                $arrValueIdsRetrieved[]                 = $objValue->$strColNameId;
                 $arrReturn[$objValue->$strColNameAlias] = $objValue->$strColNameValue;
             }
-            // Determine missing ids.
-            $arrValueIds = array_diff($arrValueIds, $arrValueIdsRetrieved);
-            // If there are missing ids and the fallback language is different than the current language, then fetch
-            // those now.
-            if ($arrValueIds
-                && ($this->getMetaModel()->getFallbackLanguage() != $this->getMetaModel()->getActiveLanguage())
-            ) {
-                $objValue = $this->getValues($arrValueIds, $this->getMetaModel()->getFallbackLanguage());
-                while ($objValue->next()) {
-                    $arrReturn[$objValue->$strColNameAlias] = $objValue->$strColNameValue;
-                }
-            }
         }
+
         return $arrReturn;
     }
 
