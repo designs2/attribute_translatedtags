@@ -452,8 +452,9 @@ class TranslatedTags extends Tags implements ITranslated
 
     /**
      * {@inheritDoc}
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    // @codingStandardsIgnoreStart - Accept that parameter $strLangCode is not used.
     public function setTranslatedDataFor($arrValues, $strLangCode)
     {
         // Although we are translated, we do not manipulate tertiary tables
@@ -461,7 +462,6 @@ class TranslatedTags extends Tags implements ITranslated
         // will do just fine.
         $this->setDataFor($arrValues);
     }
-    // @codingStandardsIgnoreEnd
 
     /**
      * {@inheritDoc}
