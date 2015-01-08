@@ -44,7 +44,7 @@ class TranslatedTags extends Tags implements ITranslated
      */
     public function getTagCount($arrIds)
     {
-        $objDB        = \Database::getInstance();
+        $objDB        = $this->getDatabase();
         $strTableName = $this->get('tag_table');
         $strColNameId = $this->get('tag_id');
         $arrReturn    = array();
@@ -95,7 +95,7 @@ class TranslatedTags extends Tags implements ITranslated
         $strColNameAlias = $this->getAliasCol();
 
         // First off, we need to determine the option ids in the foreign table.
-        $objDB = \Database::getInstance();
+        $objDB = $this->getDatabase();
 
         $join    = false;
         $fields  = false;
@@ -252,7 +252,7 @@ class TranslatedTags extends Tags implements ITranslated
         }
 
         // Now for the retrieval, first with the real language.
-        return \Database::getInstance()->prepare(sprintf(
+        return $this->getDatabase()->prepare(sprintf(
             'SELECT %1$s.* %7$s
             FROM %1$s
             %9$s
@@ -389,7 +389,7 @@ class TranslatedTags extends Tags implements ITranslated
      */
     public function getTranslatedDataFor($arrIds, $strLangCode)
     {
-        $objDB              = \Database::getInstance();
+        $objDB              = $this->getDatabase();
         $strTableName       = $this->get('tag_table');
         $strColNameId       = $this->get('tag_id');
         $strColNameLangCode = $this->get('tag_langcolumn');
@@ -510,7 +510,8 @@ class TranslatedTags extends Tags implements ITranslated
                 // @codingStandardsIgnoreEnd
             ),
             $arrParams,
-            'item_id'
+            'item_id',
+            $this->getDatabase()
         );
 
         return $objFilterRule->getMatchingIds();
