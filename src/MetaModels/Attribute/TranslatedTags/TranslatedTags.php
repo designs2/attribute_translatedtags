@@ -100,7 +100,7 @@ class TranslatedTags extends Tags implements ITranslated
         }
 
         // Get name of the alias column.
-        $strColNameAlias = $this->getAliasCol();
+        $strColNameAlias = $this->getAliasColumn();
 
         // First off, we need to determine the option ids in the foreign table.
         $objDB = $this->getDatabase();
@@ -307,7 +307,7 @@ class TranslatedTags extends Tags implements ITranslated
             }
 
             $strColNameValue = $this->get('tag_column');
-            $strColNameAlias = $this->getAliasCol();
+            $strColNameAlias = $this->getAliasColumn();
 
             // Now for the retrival, first with the real language.
             $objValue             = $this->getValues($arrValueIds, $this->getMetaModel()->getActiveLanguage());
