@@ -28,9 +28,6 @@ class Subscriber extends \MetaModels\DcGeneral\Events\Table\Attribute\Tags\Subsc
      * Boot the system in the backend.
      *
      * @return void
-     *
-     * @SuppressWarnings(PHPMD.Superglobals)
-     * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
     protected function registerEventsInDispatcher()
     {
