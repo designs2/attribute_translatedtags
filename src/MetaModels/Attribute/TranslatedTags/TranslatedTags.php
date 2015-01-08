@@ -36,6 +36,48 @@ use MetaModels\Filter\Rules\SimpleQuery;
 class TranslatedTags extends Tags implements ITranslated
 {
     /**
+     * Retrieve the name of the language column.
+     *
+     * @return string
+     */
+    protected function getTagLangColumn()
+    {
+        return $this->get('tag_langcolumn') ?: null;
+    }
+
+    /**
+     * Retrieve the sorting source table.
+     *
+     * @return string
+     */
+    protected function getTagSortSourceTable()
+    {
+        return $this->get('tag_srctable') ?: null;
+    }
+
+    /**
+     * Retrieve the sorting source column.
+     *
+     * @param bool $prefixWithTable Flag if the column name shall be prefixed with the table name "<table>.<column>".
+     *
+     * @return string
+     */
+    protected function getTagSortSourceColumn($prefixWithTable)
+    {
+        $column = $this->get('tag_srcsorting');
+
+        if (!$column) {
+            return null;
+        }
+
+        if ($prefixWithTable) {
+            return $this->getTagSortSourceTable() . '.' . $column;
+        }
+
+        return $column;
+    }
+
+    /**
      * Determine the amount of entries in the relation table for this attribute and the given value ids.
      *
      * @param int[] $arrIds The ids of the items for which the tag count shall be determined.
@@ -45,8 +87,8 @@ class TranslatedTags extends Tags implements ITranslated
     public function getTagCount($arrIds)
     {
         $objDB        = $this->getDatabase();
-        $strTableName = $this->get('tag_table');
-        $strColNameId = $this->get('tag_id');
+        $strTableName = $this->getTagSource();
+        $strColNameId = $this->getIdColumn();
         $arrReturn    = array();
 
         if ($strTableName && $strColNameId) {
@@ -91,7 +133,7 @@ class TranslatedTags extends Tags implements ITranslated
      *
      * @return int[] a list of all matching value ids.
      *
-     * @see TranslatedTags::getFilterOptions().
+     * @see    TranslatedTags::getFilterOptions().
      */
     protected function getValueIds($arrIds, $blnUsedOnly, &$arrCount = null)
     {
@@ -108,21 +150,22 @@ class TranslatedTags extends Tags implements ITranslated
         $join    = false;
         $fields  = false;
         $sorting = false;
-        $where   = ($this->get('tag_where')
-            ? 'AND ('.html_entity_decode($this->get('tag_where').')')
-            : false);
-        if ($this->get('tag_srctable')) {
-            $fields = ', ' . $this->get('tag_srctable') . '.*';
+        $where   = $this->getWhereColumn()
+            ? 'AND (' . $this->getWhereColumn() . ')'
+            : false;
+
+        if ($this->getTagSortSourceTable()) {
+            $fields = ', ' . $this->getTagSortSourceTable() . '.*';
             $join   = sprintf(
                 'JOIN %s ON %s.%s=%s.id',
-                $this->get('tag_srctable'),
-                $this->get('tag_table'),
-                $this->get('tag_id'),
-                $this->get('tag_srctable')
+                $this->getTagSortSourceTable(),
+                $this->getTagSource(),
+                $this->getIdColumn(),
+                $this->getTagSortSourceTable()
             );
 
-            if ($this->get('tag_srcsorting')) {
-                $sorting = $this->get('tag_srctable') . '.' . $this->get('tag_srcsorting') . ',';
+            if ($this->getTagSortSourceColumn(true)) {
+                $sorting = $this->getTagSortSourceColumn(true) . ',';
             }
         }
 
@@ -139,10 +182,10 @@ class TranslatedTags extends Tags implements ITranslated
                 GROUP BY %1$s.%2$s
                 ORDER BY %7$s %1$s.%4$s',
                 // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                $this->get('tag_table'),    // 1
-                $this->get('tag_id'),       // 2
+                $this->getTagSource(),      // 1
+                $this->getIdColumn(),       // 2
                 implode(',', $arrIds),      // 3
-                $this->get('tag_sorting'),  // 4
+                $this->getSortingColumn(),  // 4
                 $where,                     // 5
                 $fields,                    // 6
                 $sorting,                   // 7
@@ -161,9 +204,9 @@ class TranslatedTags extends Tags implements ITranslated
                 GROUP BY tl_metamodel_tag_relation.value_id
                 ORDER BY %6$s %3$s.%2$s',
                 // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                $this->get('tag_id'),      // 1
-                $this->get('tag_sorting'), // 2
-                $this->get('tag_table'),   // 3
+                $this->getIdColumn(),      // 1
+                $this->getSortingColumn(), // 2
+                $this->getTagSource(),     // 3
                 $where,                    // 4
                 $fields,                   // 5
                 $sorting,                  // 6
@@ -181,9 +224,9 @@ class TranslatedTags extends Tags implements ITranslated
                 GROUP BY %1$s.%2$s
                 ORDER BY %6$s %3$s',
                 // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-                $this->get('tag_table'),   // 1
-                $this->get('tag_id'),      // 2
-                $this->get('tag_sorting'), // 3
+                $this->getTagSource(),     // 1
+                $this->getIdColumn(),      // 2
+                $this->getSortingColumn(), // 3
                 $where
                     ? 'WHERE ' . substr($where, 4)
                     : '',                  // 4
@@ -197,7 +240,7 @@ class TranslatedTags extends Tags implements ITranslated
         }
 
         $arrReturn = array();
-        $strField  = $this->get('tag_id');
+        $strField  = $this->getIdColumn();
 
         while ($objValueIds->next()) {
             $intID    = $objValueIds->$strField;
@@ -241,21 +284,21 @@ class TranslatedTags extends Tags implements ITranslated
         $join    = false;
         $fields  = false;
         $sorting = false;
-        $where   = ($this->get('tag_where')
-            ? 'AND ('.html_entity_decode($this->get('tag_where').')')
-            : false);
-        if ($this->get('tag_srctable')) {
-            $fields = ', ' . $this->get('tag_srctable') . '.*';
+        $where   = $this->getWhereColumn()
+            ? 'AND (' . $this->getWhereColumn() . ')'
+            : false;
+        if ($this->getTagSortSourceTable()) {
+            $fields = ', ' . $this->getTagSortSourceTable() . '.*';
             $join   = sprintf(
                 'JOIN %s ON %s.%s=%s.id',
-                $this->get('tag_srctable'),
-                $this->get('tag_table'),
-                $this->get('tag_id'),
-                $this->get('tag_srctable')
+                $this->getTagSortSourceTable(),
+                $this->getTagSource(),
+                $this->getIdColumn(),
+                $this->getTagSortSourceTable()
             );
 
-            if ($this->get('tag_srcsorting')) {
-                $sorting = $this->get('tag_srctable') . '.' . $this->get('tag_srcsorting') . ',';
+            if ($this->getTagSortSourceColumn(true)) {
+                $sorting = $this->getTagSortSourceColumn(true) . ',';
             }
         }
 
@@ -268,11 +311,11 @@ class TranslatedTags extends Tags implements ITranslated
             GROUP BY %1$s.%2$s
             ORDER BY %8$s %1$s.%5$s',
             // @codingStandardsIgnoreStart - We want to keep the numbers as comment at the end of the following lines.
-            $this->get('tag_table'),      // 1
-            $this->get('tag_id'),         // 2
+            $this->getTagSource(),        // 1
+            $this->getIdColumn(),         // 2
             implode(',', $arrValueIds),   // 3
-            $this->get('tag_langcolumn'), // 4
-            $this->get('tag_sorting'),    // 5
+            $this->getTagLangColumn(),    // 4
+            $this->getSortingColumn(),    // 5
             $where,                       // 6
             $fields,                      // 7
             $sorting,                     // 8
@@ -299,14 +342,14 @@ class TranslatedTags extends Tags implements ITranslated
     {
         $arrReturn = array();
 
-        if ($this->get('tag_table') && ($strColNameId = $this->get('tag_id'))) {
+        if ($this->getTagSource() && ($strColNameId = $this->getIdColumn())) {
             // Fetch the value ids.
             $arrValueIds = $this->getValueIds($arrIds, $usedOnly, $arrCount);
             if (!count($arrValueIds)) {
                 return $arrReturn;
             }
 
-            $strColNameValue = $this->get('tag_column');
+            $strColNameValue = $this->getValueColumn();
             $strColNameAlias = $this->getAliasColumn();
 
             // Now for the retrival, first with the real language.
@@ -398,10 +441,10 @@ class TranslatedTags extends Tags implements ITranslated
     public function getTranslatedDataFor($arrIds, $strLangCode)
     {
         $objDB              = $this->getDatabase();
-        $strTableName       = $this->get('tag_table');
-        $strColNameId       = $this->get('tag_id');
-        $strColNameLangCode = $this->get('tag_langcolumn');
-        $strSortColumn      = $this->get('tag_sorting');
+        $strTableName       = $this->getTagSource();
+        $strColNameId       = $this->getIdColumn();
+        $strColNameLangCode = $this->getTagLangColumn();
+        $strSortColumn      = $this->getSortingColumn();
         $arrReturn          = array();
 
         if ($strTableName && $strColNameId && $strColNameLangCode) {
@@ -410,20 +453,20 @@ class TranslatedTags extends Tags implements ITranslated
 
             $join  = false;
             $field = false;
-            $where = ($this->get('tag_where')
-                ? 'AND ('.html_entity_decode($this->get('tag_where').')')
-                : false);
-            if ($this->get('tag_srctable')) {
+            $where = $this->getWhereColumn()
+                ? 'AND (' . $this->getWhereColumn() . ')'
+                : false;
+            if ($this->getTagSortSourceTable()) {
                 $join = sprintf(
                     'JOIN %s ON %s.%s=%s.id',
-                    $this->get('tag_srctable'),
-                    $this->get('tag_table'),
-                    $this->get('tag_id'),
-                    $this->get('tag_srctable')
+                    $this->getTagSortSourceTable(),
+                    $this->getTagSource(),
+                    $this->getIdColumn(),
+                    $this->getTagSortSourceTable()
                 );
 
-                if ($this->get('tag_srcsorting')) {
-                    $field = ', ' . $this->get('tag_srctable') . '.' . $this->get('tag_srcsorting');
+                if ($this->getTagSortSourceColumn(true)) {
+                    $field = ', ' . $this->getTagSortSourceColumn(true);
                 }
             }
 
@@ -487,11 +530,11 @@ class TranslatedTags extends Tags implements ITranslated
     public function searchForInLanguages($strPattern, $arrLanguages = array())
     {
         $arrParams          = array($strPattern, $strPattern);
-        $strTableName       = $this->get('tag_table');
-        $strColNameId       = $this->get('tag_id');
-        $strColNameLangCode = $this->get('tag_langcolumn');
-        $strColumn          = $this->get('tag_column');
-        $strColAlias        = $this->get('tag_alias') ? $this->get('tag_alias') : $strColNameId;
+        $strTableName       = $this->getTagSource();
+        $strColNameId       = $this->getIdColumn();
+        $strColNameLangCode = $this->getTagLangColumn();
+        $strColumn          = $this->getValueColumn();
+        $strColAlias        = $this->getAliasColumn();
 
         $languages = '';
         if ($arrLanguages) {
