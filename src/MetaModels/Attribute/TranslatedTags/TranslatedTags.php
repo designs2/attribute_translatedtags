@@ -50,19 +50,26 @@ class TranslatedTags extends Tags implements ITranslated
         $arrReturn    = array();
 
         if ($strTableName && $strColNameId) {
-            $objValue = $objDB->prepare(sprintf(
-                'SELECT `item_id`, count(*) as count FROM `tl_metamodel_tag_relation`
-                    WHERE att_id = ? AND item_id IN (%1$s) group BY `item_id`',
-                implode(',', $arrIds)
-            ))
+            $objValue = $objDB
+                ->prepare(sprintf(
+                    'SELECT `item_id`, count(*) as count
+                    FROM `tl_metamodel_tag_relation`
+                    WHERE att_id = ? AND item_id IN (%1$s)
+                    GROUP BY `item_id`',
+                    implode(',', $arrIds)
+                ))
                 ->execute($this->get('id'));
 
             while ($objValue->next()) {
+                /** @noinspection PhpUndefinedFieldInspection */
+                $itemId = $objValue->item_id;
 
-                if (!$arrReturn[$objValue->item_id]) {
-                    $arrReturn[$objValue->item_id] = array();
+                if (!isset($arrReturn[$itemId])) {
+                    $arrReturn[$itemId] = array();
                 }
-                $arrReturn[$objValue->item_id] = $objValue->count;
+
+                /** @noinspection PhpUndefinedFieldInspection */
+                $arrReturn[$itemId] = $objValue->count;
             }
         }
         return $arrReturn;
@@ -73,8 +80,7 @@ class TranslatedTags extends Tags implements ITranslated
      *
      * NOTE: this does not take the actual availability of an value in the current or
      * fallback languages into account.
-     * This method is mainly intended as a helper for
-     * {@see MetaModelAttributeTranslatedTags::getFilterOptions()}
+     * This method is mainly intended as a helper for TranslatedTags::getFilterOptions().
      *
      * @param int[] $arrIds      A list of item ids that the result shall be limited to.
      *
@@ -84,6 +90,8 @@ class TranslatedTags extends Tags implements ITranslated
      *                           nothing.
      *
      * @return int[] a list of all matching value ids.
+     *
+     * @see TranslatedTags::getFilterOptions().
      */
     protected function getValueIds($arrIds, $blnUsedOnly, &$arrCount = null)
     {
