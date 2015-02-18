@@ -362,7 +362,7 @@ class TranslatedTags extends Tags implements ITranslated
     /**
      * {@inheritDoc}
      */
-    public function getFilterOptions($arrIds, $usedOnly, &$arrCount = null)
+    public function getFilterOptions($idList, $usedOnly, &$arrCount = null)
     {
         if (!$this->getTagSource() && $this->getIdColumn()) {
             return array();
@@ -372,7 +372,7 @@ class TranslatedTags extends Tags implements ITranslated
         $strColNameId = $this->getIdColumn();
 
         // Fetch the value ids.
-        $arrValueIds = $this->getValueIds($arrIds, $usedOnly, $arrCount);
+        $arrValueIds = $this->getValueIds($idList, $usedOnly, $arrCount);
         if (!count($arrValueIds)) {
             return $arrReturn;
         }
