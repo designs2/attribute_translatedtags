@@ -139,7 +139,7 @@ class TranslatedTags extends Tags implements ITranslated
             $result[]          = $valueId;
         }
 
-        if ($counter !== null) {
+        if (($counter !== null) && !empty($result)) {
             $objCount = $this
                 ->getDatabase()
                 ->prepare(
@@ -147,9 +147,9 @@ class TranslatedTags extends Tags implements ITranslated
                         'SELECT value_id, COUNT(value_id) as mm_count
                         FROM tl_metamodel_tag_relation
                         WHERE att_id=?
-                        AND value_id IN %s
+                        AND value_id IN (%s)
                         GROUP BY item_id',
-                        implode(',', array_fill(0, count($result), '?'))
+                        $this->parameterMask($result)
                     )
                 )
                 ->execute(array_merge(array($this->get('id')), $result));
