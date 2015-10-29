@@ -1,5 +1,5 @@
 {
-  "name": "metamodels/attribute_translatedtags",
+  "name": "designs2/attribute_translatedtags",
   "description": "MetaModels attribute for translated text",
   "keywords": [
     "contao",
@@ -29,19 +29,19 @@
     "issues": "https://github.com/MetaModels/attribute_translatedtags/issues",
     "wiki": "http://de.contaowiki.org/MetaModels",
     "irc": "irc://irc.freenode.org/contao.mm",
-    "source": "https://github.com/MetaModels/attribute_translatedtags"
+    "source": "https://github.com/designs2/attribute_translatedtags"
   },
   "require": {
     "php": ">=5.3",
     "contao/core": ">=3.2,<3.6",
-    "contao-community-alliance/composer-plugin": "~2.0",
-    "metamodels/core": "~2.0",
-    "metamodels/attribute_tags": "~2.0"
+    "contao-community-alliance/composer-plugin": "*",
+    "metamodels/core": "*",
+    "metamodels/attribute_tags": "*"
   },
   "require-dev": {
-    "cyberspectrum/contao-toolbox": "~0.6",
-    "phpcq/all-tasks": "~1.0",
-    "metamodels/base-unit-tests": "~1.0"
+    "cyberspectrum/contao-toolbox": "*",
+    "phpcq/all-tasks": "*",
+    "metamodels/base-unit-tests": "*"
   },
   "conflict": {
     "contao/core": "3.4.0"
